@@ -4,6 +4,7 @@ import os
 from supabase import create_client
 import plotly.express as px
 import subprocess
+import sys
 
 # -------------------------
 # LOAD ENV VARIABLES
@@ -61,13 +62,18 @@ elif section == "View Predictions":
 # -------------------------
 # SECTION 3 — Run Pipeline
 # -------------------------
+
+
 elif section == "Run Pipeline":
     st.header("⚙️ Run ML Pipeline")
     if st.button("Run Pipeline Now"):
         st.info("Pipeline is running... please wait a few seconds.")
         try:
-            # Run pipeline in Python subprocess to avoid Streamlit warnings
-            subprocess.run(["python", "ml_pipeline.py"], check=True)
+            subprocess.run(
+                [sys.executable, "ml_pipeline.py"],
+                cwd=os.path.dirname(__file__),
+                check=True
+            )
             st.success("Pipeline executed successfully ✅")
         except subprocess.CalledProcessError as e:
             st.error(f"Pipeline execution failed: {e}")
