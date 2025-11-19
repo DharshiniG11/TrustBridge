@@ -62,21 +62,41 @@ elif section == "View Predictions":
 # -------------------------
 # SECTION 3 — Run Pipeline
 # -------------------------
-
-
 elif section == "Run Pipeline":
     st.header("⚙️ Run ML Pipeline")
+
+    # Absolute path to the pipeline file
+    pipeline_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ml_pipeline.py")
+
+    # Check if pipeline file exists
+    if not os.path.exists(pipeline_path):
+        st.error(f"❌ Pipeline file not found.\nExpected at:\n{pipeline_path}")
+    else:
+        st.success(f"Pipeline file found at:\n{pipeline_path}")
+
     if st.button("Run Pipeline Now"):
-        st.info("Pipeline is running... please wait a few seconds.")
+        st.info("Pipeline is running... please wait.")
+
+        import sys
+
         try:
-            subprocess.run(
-                [sys.executable, "ml_pipeline.py"],
-                cwd=os.path.dirname(__file__),
-                check=True
+            # Execute the pipeline safely
+            result = subprocess.run(
+                [sys.executable, pipeline_path],
+                capture_output=True,
+                text=True
             )
-            st.success("Pipeline executed successfully ✅")
-        except subprocess.CalledProcessError as e:
-            st.error(f"Pipeline execution failed: {e}")
+
+            # Check result
+            if result.returncode == 0:
+                st.success("✅ Pipeline executed successfully!")
+                st.code(result.stdout)
+            else:
+                st.error("❌ Pipeline execution failed!")
+                st.code(result.stderr)
+
+        except Exception as e:
+            st.error(f"Unexpected error: {str(e)}")
 
 # -------------------------
 # SECTION 4 — Analytics Dashboard
